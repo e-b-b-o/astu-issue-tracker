@@ -1,0 +1,47 @@
+/* Most CSS is shared with StudentDashboard.css, adding specific overrides here */
+.staff-action-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-summary {
+  background-color: var(--bg-elevated);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.ticket-summary h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.ticket-summary p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.current-status-badge {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: var(--spacing-sm);
+}
+
+.update-status-form {
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--spacing-md);
+}
+
+.text-error { color: var(--error); }
+.text-warning { color: var(--warning); }
+.text-success { color: var(--success); }
+
+.flex { display: flex; }
+.justify-end { justify-content: flex-end; }
+.gap-2 { gap: var(--spacing-sm); }
+.mt-2 { margin-top: var(--spacing-sm); }
+.mt-4 { margin-top: var(--spacing-md); }
