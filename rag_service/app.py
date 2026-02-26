@@ -1,5 +1,3 @@
-import boot  # noqa: F401 — compatibility patches (not needed anymore, patches moved to rag_engine.py)
-
 import os
 from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
