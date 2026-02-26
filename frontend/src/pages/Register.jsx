@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import Button from '../components/ui/Button';
@@ -30,6 +31,7 @@ const Register = () => {
 
   return (
     <div className="auth-page fade-in">
+      <Link to="/" className="auth-back-link"><ArrowLeft size={14} /> Back to Home</Link>
       <div className="auth-card fade-in-up">
         <div className="auth-header">
           <div className="auth-logo">■ ASTU TRACKER</div>

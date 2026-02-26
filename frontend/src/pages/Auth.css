@@ -2,10 +2,12 @@
 
 .auth-page {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   padding: 24px;
+  gap: 16px;
 }
 
 .auth-card {
@@ -108,3 +110,43 @@
   transition: color var(--transition-fast);
 }
 .auth-link:hover { color: var(--primary-hover); }
+
+/* Back to Home link */
+.auth-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.auth-back-link:hover { color: var(--text-primary); }
+
+/* Forgot Password link */
+.auth-forgot-link {
+  display: block;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+.auth-forgot-link:hover { color: var(--text-primary); }
+
+/* Success message */
+.auth-success {
+  padding: 16px;
+  border: 1px solid #27272a;
+  border-radius: var(--radius);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  background: rgba(255,255,255,0.02);
+}
+

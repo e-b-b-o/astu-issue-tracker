@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import Button from '../components/ui/Button';
-import ChatWindow from '../components/chatbot/ChatWindow';
 import { ShieldCheck, Clock, BarChart2, MessageSquare, ArrowRight } from 'lucide-react';
 import './Landing.css';
 
@@ -69,19 +68,19 @@ const Landing = () => (
         </div>
       </section>
 
-      {/* Steps */}
+      {/* How It Works — Steps as Cards */}
       <section className="landing-section">
         <div className="landing-section-header">
           <div className="landing-eyebrow">PROCESS</div>
           <h2>How It Works</h2>
           <p>Three simple steps to resolve your issues.</p>
         </div>
-        <div className="landing-steps">
+        <div className="landing-steps-grid">
           {STEPS.map(({ n, title, desc }) => (
-            <div className="landing-step" key={n}>
+            <div className="landing-step-card" key={n}>
               <div className="landing-step-num">{n}</div>
-              <h3>{title}</h3>
-              <p>{desc}</p>
+              <h3 className="landing-step-title">{title}</h3>
+              <p className="landing-step-desc">{desc}</p>
             </div>
           ))}
         </div>
@@ -95,18 +94,6 @@ const Landing = () => (
           <Link to="/register">
             <Button variant="primary" size="lg">Create Account</Button>
           </Link>
-        </div>
-      </section>
-
-      {/* AI Assistant — visible to all, auth-guarded on send */}
-      <section className="landing-section" id="assistant">
-        <div className="landing-section-header">
-          <div className="landing-eyebrow">AI SUPPORT</div>
-          <h2>Ask Our Assistant</h2>
-          <p>Get instant answers about campus policies, complaint procedures, and more.</p>
-        </div>
-        <div className="landing-chat-wrapper">
-          <ChatWindow />
         </div>
       </section>
     </main>
