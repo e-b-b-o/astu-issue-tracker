@@ -1,0 +1,54 @@
+/* Floating Chatbot FAB + Panel */
+.floating-chat-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: var(--background);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              background 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-chat-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.5);
+}
+
+.floating-chat-btn--active {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+/* Panel */
+.floating-chat-overlay {
+  position: fixed;
+  bottom: 88px;
+  right: 24px;
+  z-index: 999;
+  width: 400px;
+  max-width: calc(100vw - 48px);
+}
+
+.floating-chat-panel {
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Override chat-window height for floating mode */
+.floating-chat-panel .chat-window {
+  height: 480px;
+  max-height: calc(100vh - 140px);
+}
