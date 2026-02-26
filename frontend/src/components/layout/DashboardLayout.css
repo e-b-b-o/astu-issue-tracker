@@ -31,3 +31,52 @@
   padding: 0 40px;
   width: 100%;
 }
+
+/* DASHBOARD UI POLISH: Refined Hover & Spacing Logic */
+
+/* 1. RESTORE HOVER for interactive elements except tabs */
+.dashboard-root .btn:hover:not(:disabled),
+.dashboard-root .sidebar-link:hover {
+  /* Restore default transitions and effects */
+  transition: all var(--transition-fast);
+}
+
+/* 2. SPECIFICALLY DISABLE HOVER for Dash Tabs (User requirement) */
+.dashboard-root .dash-tab:hover {
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+
+.dashboard-root .dash-tab--active:hover {
+  color: var(--background) !important;
+  background: var(--primary-color) !important;
+}
+
+/* 3. RESTORE & SOFTEN CARD HOVERS */
+.dashboard-root .complaint-card,
+.dashboard-root .stat-card,
+.dashboard-root .admin-table-row {
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-root .complaint-card:hover,
+.dashboard-root .admin-table-row:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dashboard-root .stat-card:hover {
+  transform: translateY(-2px) !important;
+  background: var(--card-bg) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 4. SMOOTH TAB CONTENT TRANSITION */
+.tab-content {
+  animation: fadeIn 0.3s ease-out;
+}
+
+

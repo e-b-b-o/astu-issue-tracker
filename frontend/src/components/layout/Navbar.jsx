@@ -21,7 +21,7 @@ const Navbar = ({ dashboard = false }) => {
           )}
           <Link to="/" className="navbar-logo">
             <span className="navbar-logo-mark">■</span>
-            <span className="navbar-logo-text">ASTU TRACKER</span>
+            <span className="navbar-logo-text">ASTU ISSUE TRACKER</span>
           </Link>
         </div>
 

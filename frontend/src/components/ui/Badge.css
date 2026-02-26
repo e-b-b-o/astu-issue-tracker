@@ -1,0 +1,20 @@
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.badge--open      { color: #a1a1aa; border-color: #3f3f46; }
+.badge--progress  { color: #f59e0b; border-color: #78350f; }
+.badge--resolved  { color: #6b7280; border-color: #374151; background: rgba(107,114,128,0.08); }
+.badge--admin   { color: var(--primary-color); border-color: var(--border); }
+.badge--staff   { color: #a1a1aa; border-color: var(--border); }
+.badge--student { color: #71717a; border-color: var(--border); }

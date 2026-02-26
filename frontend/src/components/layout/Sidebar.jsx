@@ -15,6 +15,7 @@ const NAV = {
   ],
   staff: [
     { to: '/dashboard/staff',    label: 'Dashboard',    icon: LayoutDashboard },
+    { to: '/dashboard/profile',  label: 'Profile',      icon: Users },
   ],
   admin: [
     { to: '/dashboard/admin',    label: 'Dashboard',    icon: LayoutDashboard },
