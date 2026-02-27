@@ -11,6 +11,14 @@ const userSchema = new mongoose.Schema(
       enum: ['student', 'staff', 'admin'],
       default: 'student',
     },
+    notifications: [
+      {
+        message: { type: String, required: true },
+        complaintId: { type: mongoose.Schema.Types.ObjectId, ref: 'Complaint' },
+        read: { type: Boolean, default: false },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

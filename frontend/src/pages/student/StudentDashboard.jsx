@@ -36,11 +36,22 @@ const StudentDashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.description) { addToast('All fields required', 'error'); return; }
+    
+    const formData = new FormData();
+    formData.append('title', form.title);
+    formData.append('category', form.category);
+    formData.append('description', form.description);
+    if (form.image) {
+      formData.append('attachment', form.image);
+    }
+
     setSubmitting(true);
     try {
-      await api.post('/complaints', form);
+      await api.post('/complaints', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       addToast('Complaint submitted', 'success');
-      setForm({ title: '', description: '', category: CATEGORIES[0] });
+      setForm({ title: '', description: '', category: CATEGORIES[0], image: null });
       setTab('complaints');
       fetchComplaints();
     } catch (err) {
@@ -93,6 +104,18 @@ const StudentDashboard = () => {
                     {selected?._id === c._id && (
                       <div className="complaint-detail fade-in">
                         <p className="complaint-desc">{c.description}</p>
+                        
+                        {c.image && (
+                          <div className="complaint-image-box" style={{ marginTop: 15 }}>
+                            <p className="remarks-label">ATTACHED IMAGE</p>
+                            <img 
+                              src={`data:${c.imageType || 'image/jpeg'};base64,${c.image}`} 
+                              alt="Complaint" 
+                              style={{ maxWidth: '200px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}
+                            />
+                          </div>
+                        )}
+
                         {c.remarks?.length > 0 && (
                           <div className="remarks">
                             <p className="remarks-label">Staff Remarks</p>
@@ -138,6 +161,14 @@ const StudentDashboard = () => {
                 <label className="form-label">Description</label>
                 <textarea className="form-input form-textarea" required placeholder="Provide all necessary details..."
                   value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Attach Image (Optional)</label>
+                <input type="file" className="form-input" accept="image/*"
+                  onChange={(e) => setForm({...form, image: e.target.files[0]})} />
+                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+                  Supported formats: JPG, JPEG, PNG. Max 10MB.
+                </p>
               </div>
               <Button type="submit" loading={submitting} disabled={submitting}>Submit Complaint</Button>
             </form>

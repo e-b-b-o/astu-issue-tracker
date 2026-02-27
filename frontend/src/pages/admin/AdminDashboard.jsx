@@ -236,6 +236,31 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
+
+            <div className="dash-section" style={{ marginTop: '24px' }}>
+              <div className="dash-section-header"><span className="dash-section-label">MOST REPORTED ISSUES</span></div>
+              <div className="complaint-list" style={{ marginTop: '12px' }}>
+                {analytics.mostReported?.map((issue, idx) => (
+                  <div key={idx} className="complaint-card" style={{ cursor: 'default', padding: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <p className="complaint-title">{issue._id}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                          Category: <span className="meta-tag" style={{ border: 'none', padding: 0 }}>{issue.category}</span>
+                        </p>
+                      </div>
+                      <div className="stat-badge" style={{ background: 'rgba(255,255,255,0.05)', padding: '8px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{issue.count}</span>
+                        <span style={{ fontSize: '10px', marginLeft: '6px', opacity: 0.6 }}>Reports</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {(!analytics.mostReported || analytics.mostReported.length === 0) && (
+                  <div className="dash-empty">No trend data available.</div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import Complaint from '../models/Complaint.js';
+import User from '../models/User.js';
 
 // @route   POST /api/complaints
 // @access  Private
@@ -10,13 +11,12 @@ export const createComplaint = async (req, res) => {
       return res.status(400).json({ message: 'Title, description, and category are required' });
     }
 
-    let attachments = [];
+    let image = null;
+    let imageType = null;
+
     if (req.file) {
-      attachments.push({
-        fileName: req.file.originalname,
-        fileUrl: `/uploads/${req.file.filename}`,
-        fileType: req.file.mimetype,
-      });
+      image = req.file.buffer.toString('base64');
+      imageType = req.file.mimetype;
     }
 
     const complaint = await Complaint.create({
@@ -24,7 +24,8 @@ export const createComplaint = async (req, res) => {
       description,
       category,
       createdBy: req.user._id,
-      attachments,
+      image,
+      imageType,
     });
 
     const populated = await Complaint.findById(complaint._id).populate('createdBy', 'username email');
@@ -101,8 +102,24 @@ export const updateComplaintStatus = async (req, res) => {
       return res.status(404).json({ message: 'Complaint not found' });
     }
 
+    const oldStatus = complaint.status;
     complaint.status = status;
     const updated = await complaint.save();
+
+    // Trigger notification for the user if status changed
+    if (oldStatus !== status) {
+      await User.findByIdAndUpdate(complaint.createdBy, {
+        $push: {
+          notifications: {
+            message: `Your complaint "${complaint.title}" has been updated to: ${status}`,
+            complaintId: complaint._id,
+            read: false,
+            createdAt: new Date(),
+          },
+        },
+      });
+    }
+
     res.json(updated);
   } catch (error) {
     console.error('[Complaint] Update status error:', error.message);

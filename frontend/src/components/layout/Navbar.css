@@ -77,3 +77,16 @@
   color: #52525b;
   font-size: 11px;
 }
+
+.navbar-notification-btn {
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-notification-btn:hover {
+  color: var(--text-primary);
+  transform: scale(1.1);
+}

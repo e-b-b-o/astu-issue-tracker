@@ -1,12 +1,23 @@
 import React from 'react';
-import { Bell, Check, Trash2 } from 'lucide-react';
-import { useNotifications } from '../../context/NotificationContext';
+import { Bell, Check, Trash2, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useNotification } from '../../context/NotificationContext';
 import './NotificationDropdown.css';
 
 const NotificationDropdown = ({ isOpen, onClose }) => {
-  const { notifications, markAsRead, clearAll } = useNotifications();
+  const { notifications, markAsRead } = useNotification();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
+
+  const handleNotificationClick = async (notif) => {
+    if (!notif.read) {
+      await markAsRead(notif._id);
+    }
+    onClose();
+    // Redirect to the complaint
+    navigate('/dashboard'); // For simplicity, though specific routing could be added
+  };
 
   return (
     <>
@@ -14,11 +25,6 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
       <div className="notification-dropdown slide-up" onClick={(e) => e.stopPropagation()}>
         <div className="dropdown-header">
           <h3>Notifications</h3>
-          {notifications.length > 0 && (
-            <button className="clear-all-btn" onClick={clearAll} title="Clear All">
-              <Trash2 size={16} />
-            </button>
-          )}
         </div>
         
         <div className="dropdown-body">
@@ -30,18 +36,21 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
           ) : (
             <ul className="notification-list">
               {notifications.map((notif) => (
-                <li key={notif.id} className={`notification-item ${!notif.read ? 'unread' : ''}`}>
-                  <div className={`notification-dot ${notif.type}`}></div>
+                <li 
+                  key={notif._id} 
+                  className={`notification-item ${!notif.read ? 'unread' : ''}`}
+                  onClick={() => handleNotificationClick(notif)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className={`notification-dot ${notif.read ? '' : 'unread'}`}></div>
                   <div className="notification-content">
                     <p>{notif.message}</p>
                     <span className="notification-time">
-                      {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   {!notif.read && (
-                    <button className="mark-read-btn" onClick={() => markAsRead(notif.id)} title="Mark as read">
-                      <Check size={16} />
-                    </button>
+                    <div className="mark-unread-indicator"></div>
                   )}
                 </li>
               ))}

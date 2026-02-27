@@ -1,9 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import Button from '../components/ui/Button';
 import { ShieldCheck, Clock, BarChart2, MessageSquare, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import heroBg from '../assets/images/vitaly-gariev-K_MSe-zglGI-unsplash.jpg';
 import './Landing.css';
 
@@ -20,8 +21,18 @@ const STEPS = [
   { n: '03', title: 'Resolved',      desc: 'The issue is fixed and status is updated. You have full visibility throughout.' },
 ];
 
-const Landing = () => (
-  <div className="landing fade-in">
+const Landing = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
+  return (
+    <div className="landing fade-in">
     <Navbar />
 
     <main>
@@ -103,6 +114,7 @@ const Landing = () => (
 
     <Footer />
   </div>
-);
+  );
+};
 
 export default Landing;

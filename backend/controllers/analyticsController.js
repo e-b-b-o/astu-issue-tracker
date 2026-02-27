@@ -5,7 +5,7 @@ import User from '../models/User.js';
 // @access  Private (Admin/Staff)
 export const getAnalytics = async (req, res) => {
   try {
-    const [total, open, inProgress, resolved, byCategory, recentComplaints] = await Promise.all([
+    const [total, open, inProgress, resolved, byCategory, recentComplaints, mostReported] = await Promise.all([
       Complaint.countDocuments(),
       Complaint.countDocuments({ status: 'Open' }),
       Complaint.countDocuments({ status: 'In Progress' }),
@@ -20,6 +20,11 @@ export const getAnalytics = async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(5)
         .select('title status category createdAt'),
+      Complaint.aggregate([
+        { $group: { _id: '$title', category: { $first: '$category' }, count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 5 },
+      ]),
     ]);
 
     const userCount = await User.countDocuments();
@@ -31,6 +36,7 @@ export const getAnalytics = async (req, res) => {
       resolved,
       byCategory,
       recentComplaints,
+      mostReported,
       userCount,
     });
   } catch (error) {

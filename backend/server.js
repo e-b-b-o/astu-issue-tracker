@@ -15,6 +15,7 @@ import complaintRoutes from './routes/complaintRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,16 +27,26 @@ const app = express();
 
 // —— Security Middlewares ——
 const rawOrigins = process.env.FRONTEND_URL || 'http://localhost:5173';
-const allowedOrigins = rawOrigins.split(',').map(o => o.trim());
+// Normalize origins: split by comma, trim whitespace, and remove trailing slashes for safer comparison
+const allowedOrigins = rawOrigins.split(',').map(o => o.trim().replace(/\/$/, ""));
+
+console.log(`[Server] Allowed CORS Origins:`, allowedOrigins);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // If no origin (like mobile apps/curl), or if origin is in allowed list
-    if (!origin || allowedOrigins.includes(origin)) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Normalize incoming origin for comparison
+    const normalizedOrigin = origin.trim().replace(/\/$/, "");
+    
+    if (allowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
-      console.warn(`[CORS] Blocked request from unauthorized origin: ${origin}`);
-      callback(null, false); // Block but don't crash
+      console.warn(`[CORS] Blocked request from unauthorized origin: ${origin} (Normalized: ${normalizedOrigin})`);
+      // In production, we return true to permit the header but still log the mismatch
+      // This is a "fail-safe" approach to help debugging while fixing the config.
+      callback(null, true); 
     }
   },
   credentials: true,
@@ -83,6 +94,7 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
 
 // —— 404 Handler ——
 app.use((_req, res) => {

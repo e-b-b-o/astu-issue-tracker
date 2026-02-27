@@ -9,8 +9,10 @@ load_dotenv()
 app = Flask(__name__)
 
 raw_origins = os.environ.get("FRONTEND_URL", "http://localhost:5173") + "," + os.environ.get("EXPRESS_URL", "http://localhost:5000")
-allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+# Normalize: split, trim, and remove trailing slashes for safer comparison
+allowed_origins = [o.strip().rstrip("/") for o in raw_origins.split(",") if o.strip()]
 
+print(f"[RAG] Allowed Origins: {allowed_origins}")
 CORS(app, origins=allowed_origins)
 
 

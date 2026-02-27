@@ -17,6 +17,8 @@ const complaintSchema = new mongoose.Schema(
         fileType: { type: String },
       },
     ],
+    image: { type: String, default: null }, // Base64 string
+    imageType: { type: String, default: null }, // MIME type
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
