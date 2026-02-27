@@ -6,7 +6,15 @@ import api from '../../services/api';
 import Button from '../ui/Button';
 import './ChatWindow.css';
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const getChatBotAPI = () => {
+  let url = import.meta.env.VITE_API_URL || '';
+  if (!url) return 'http://localhost:5000/api';
+  if (!url.endsWith('/api') && !url.endsWith('/api/')) {
+    url = url.endsWith('/') ? `${url}api` : `${url}/api`;
+  }
+  return url;
+};
+const API_BASE = getChatBotAPI();
 
 const ChatWindow = () => {
   const { user } = useAuth();

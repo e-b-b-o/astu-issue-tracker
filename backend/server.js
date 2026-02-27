@@ -25,18 +25,21 @@ connectDB();
 const app = express();
 
 // —— Security Middlewares ——
-const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:5173'];
+const rawOrigins = process.env.FRONTEND_URL || 'http://localhost:5173';
+const allowedOrigins = rawOrigins.split(',').map(o => o.trim());
 
 app.use(cors({
   origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps or curl requests)
+    // If no origin (like mobile apps/curl), or if origin is in allowed list
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      console.warn(`[CORS] Blocked request from unauthorized origin: ${origin}`);
+      callback(null, false); // Block but don't crash
     }
   },
   credentials: true,
+  optionsSuccessStatus: 204,
 }));
 
 app.use(helmet({

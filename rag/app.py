@@ -8,10 +8,10 @@ load_dotenv()
 
 app = Flask(__name__)
 
-CORS(app, origins=[
-    os.environ.get("EXPRESS_URL", "http://localhost:5000"),
-    os.environ.get("FRONTEND_URL", "http://localhost:5173"),
-])
+raw_origins = os.environ.get("FRONTEND_URL", "http://localhost:5173") + "," + os.environ.get("EXPRESS_URL", "http://localhost:5000")
+allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+
+CORS(app, origins=allowed_origins)
 
 
 @app.route("/health", methods=["GET"])
