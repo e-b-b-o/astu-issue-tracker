@@ -6,7 +6,7 @@ import api from '../../services/api';
 import Button from '../ui/Button';
 import './ChatWindow.css';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL;
 
 const ChatWindow = () => {
   const { user } = useAuth();

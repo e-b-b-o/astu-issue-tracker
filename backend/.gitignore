@@ -1,26 +1,19 @@
-# Dependency directories
 node_modules/
-
-
-# Build outputs
+.env
+.env.local
+.env.*.local
 dist/
 dist-ssr/
 build/
 *.mjs.map
-
-# Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-# OS/Editor files
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-
-# User uploads
 uploads/*
 !uploads/.gitkeep

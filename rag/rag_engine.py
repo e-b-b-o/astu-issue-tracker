@@ -91,6 +91,8 @@ class RAGEngine:
 
         try:
             self.gen_client = genai.Client(api_key=api_key)
+            # Use persistent storage for ChromaDB in production if desired, 
+            # here we continue with ephemeral but ensure it's clean.
             self.chroma_client = chromadb.Client()
             self.embed_fn = GeminiEmbedding(api_key=api_key, model=EMBEDDING_MODEL)
 
