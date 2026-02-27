@@ -4,7 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import api from '../../services/api';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
-import ChatWindow from '../../components/chatbot/ChatWindow';
+
 import './StudentDashboard.css';
 
 const CATEGORIES = ['Academic', 'Facilities', 'Administration', 'IT/Tech', 'Other'];
@@ -58,94 +58,94 @@ const StudentDashboard = () => {
           <h1 className="dash-title">Welcome, {user?.username}</h1>
         </div>
         <div className="dash-tabs">
-          {[['complaints', 'My Issues'], ['new', 'New Issue'], ['chat', 'AI Chat']].map(([k, l]) => (
+          {[['complaints', 'My Issues'], ['new', 'New Issue']].map(([k, l]) => (
             <button key={k} className={`dash-tab ${tab === k ? 'dash-tab--active' : ''}`}
               onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
       </div>
 
-      {tab === 'complaints' && (
-        <div className="dash-section">
-          <div className="dash-section-header">
-            <span className="dash-section-label">YOUR COMPLAINTS &mdash; {complaints.length}</span>
-            <Button variant="primary" size="sm" onClick={() => setTab('new')}>+ New Issue</Button>
-          </div>
-          {loading ? (
-            <div className="dash-loading"><div className="spinner" /></div>
-          ) : complaints.length === 0 ? (
-            <div className="dash-empty">No complaints submitted yet.</div>
-          ) : (
-            <div className="complaint-list">
-              {complaints.map((c) => (
-                <div key={c._id} className="complaint-card"
-                  onClick={() => setSelected(selected?._id === c._id ? null : c)}>
-                  <div className="complaint-card-top">
-                    <span className="complaint-title">{c.title}</span>
-                    <Badge label={c.status} />
-                  </div>
-                  <div className="complaint-card-meta">
-                    <span className="meta-tag">{c.category}</span>
-                    <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  {selected?._id === c._id && (
-                    <div className="complaint-detail fade-in">
-                      <p className="complaint-desc">{c.description}</p>
-                      {c.remarks?.length > 0 && (
-                        <div className="remarks">
-                          <p className="remarks-label">REMARKS</p>
-                          {c.remarks.map((r, i) => (
-                            <div key={i} className="remark-item">
-                              <span className="remark-author">{r.addedBy?.username || 'Staff'}</span>
-                              <span className="remark-text">{r.text}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+      <div className="tab-content fade-in">
+        {/* COMPLAINTS LIST */}
+        {tab === 'complaints' && (
+          <div className="dash-section">
+            <div className="dash-section-header">
+              <span className="dash-section-label">MY COMPLAINTS &mdash; {complaints.length}</span>
+              <Button size="sm" onClick={() => setTab('new')}>New Complaint</Button>
+            </div>
+
+            {loading ? (
+              <div className="dash-loading"><div className="spinner" /></div>
+            ) : complaints.length === 0 ? (
+              <div className="dash-empty">You haven't submitted any complaints yet.</div>
+            ) : (
+              <div className="complaint-list">
+                {complaints.map((c) => (
+                  <div key={c._id} className="complaint-card" onClick={() => setSelected(selected?._id === c._id ? null : c)}>
+                    <div className="complaint-card-top">
+                      <span className="complaint-title">{c.title}</span>
+                      <Badge label={c.status} />
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {tab === 'new' && (
-        <div className="dash-section">
-          <div className="dash-section-header">
-            <span className="dash-section-label">NEW COMPLAINT</span>
+                    <div className="complaint-card-meta">
+                      <span className="meta-tag">{c.category}</span>
+                      <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    {selected?._id === c._id && (
+                      <div className="complaint-detail fade-in">
+                        <p className="complaint-desc">{c.description}</p>
+                        {c.remarks?.length > 0 && (
+                          <div className="remarks">
+                            <p className="remarks-label">Staff Remarks</p>
+                            {c.remarks.map((r, i) => (
+                              <div key={i} className="remark-item">
+                                <span className="remark-author">{r.addedBy?.username || 'Staff'}</span>
+                                <span className="remark-text">{r.text}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <form className="complaint-form" onSubmit={handleSubmit}>
-            <div className="form-field">
-              <label className="form-label">TITLE</label>
-              <input className="form-input" value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Brief summary of the issue" />
-            </div>
-            <div className="form-field">
-              <label className="form-label">CATEGORY</label>
-              <select className="form-input form-select" value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
-              </select>
-            </div>
-            <div className="form-field">
-              <label className="form-label">DESCRIPTION</label>
-              <textarea className="form-input form-textarea" rows={5} value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                placeholder="Describe the issue in detail" />
-            </div>
-            <Button type="submit" variant="primary" loading={submitting}>Submit Complaint</Button>
-          </form>
-        </div>
-      )}
+        )}
 
-      {tab === 'chat' && (
-        <div className="dash-section">
-          <ChatWindow />
-        </div>
-      )}
+        {/* NEW COMPLAINT FORM */}
+        {tab === 'new' && (
+          <div className="dash-section">
+            <div className="dash-section-header">
+              <span className="dash-section-label">SUBMIT NEW COMPLAINT</span>
+              <Button variant="secondary" size="sm" onClick={() => setTab('complaints')}>Cancel</Button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="complaint-form dash-empty" style={{ textAlign: 'left', maxWidth: 'none' }}>
+              <div className="form-field">
+                <label className="form-label">Title</label>
+                <input className="form-input" required placeholder="Brief summary of the issue"
+                  value={form.title} onChange={(e) => setForm({...form, title: e.target.value})} />
+              </div>
+              <div className="form-field">
+                <label className="form-label">Category</label>
+                <select className="form-input" value={form.category}
+                  onChange={(e) => setForm({...form, category: e.target.value})}>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Description</label>
+                <textarea className="form-input form-textarea" required placeholder="Provide all necessary details..."
+                  value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} />
+              </div>
+              <Button type="submit" loading={submitting} disabled={submitting}>Submit Complaint</Button>
+            </form>
+          </div>
+        )}
+      </div>
+
+
     </div>
   );
 };

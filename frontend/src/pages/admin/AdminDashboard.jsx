@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import api from '../../services/api';
@@ -11,7 +12,28 @@ import './AdminDashboard.css';
 const AdminDashboard = () => {
   const { user } = useAuth();
   const { addToast } = useNotification();
-  const [tab, setTab] = useState('overview');
+  const location = useLocation();
+
+  const getInitialTab = () => {
+    const path = location.pathname.split('/').pop();
+    if (['complaints', 'users', 'documents', 'analytics'].includes(path)) {
+      return path;
+    }
+    return 'overview';
+  };
+
+  const [tab, setTab] = useState(getInitialTab());
+
+  // Sync tab state with URL navigation
+  useEffect(() => {
+    const path = location.pathname.split('/').pop();
+    if (['complaints', 'users', 'documents', 'analytics'].includes(path)) {
+      setTab(path);
+    } else if (path === 'admin') {
+      setTab('overview');
+    }
+  }, [location.pathname]);
+
   const [analytics, setAnalytics] = useState(null);
   const [complaints, setComplaints] = useState([]);
   const [users, setUsers] = useState([]);
@@ -119,166 +141,236 @@ const AdminDashboard = () => {
           <h1 className="dash-title">Admin Dashboard</h1>
         </div>
         <div className="dash-tabs">
-          {[['overview','Overview'],['complaints','Complaints'],['users','Users'],['documents','Documents']].map(([k,l]) => (
+          {[
+            ['overview','Overview'],
+            ['analytics', 'Analytics'],
+            ['complaints','Complaints'],
+            ['users','Users'],
+            ['documents','Documents']
+          ].map(([k,l]) => (
             <button key={k} className={`dash-tab ${tab===k?'dash-tab--active':''}`}
               onClick={() => setTab(k)}>{l}</button>
           ))}
         </div>
       </div>
 
-      {/* OVERVIEW */}
-      {tab === 'overview' && analytics && (
-        <>
-          <div className="dash-stats">
-            <div className="stat-card"><p className="stat-label">Total Issues</p><p className="stat-value">{analytics.total}</p></div>
-            <div className="stat-card"><p className="stat-label">Open</p><p className="stat-value">{analytics.open}</p></div>
-            <div className="stat-card"><p className="stat-label">In Progress</p><p className="stat-value">{analytics.inProgress}</p></div>
-            <div className="stat-card"><p className="stat-label">Resolved</p><p className="stat-value">{analytics.resolved}</p></div>
-            <div className="stat-card"><p className="stat-label">Total Users</p><p className="stat-value">{analytics.userCount}</p></div>
-            <div className="stat-card"><p className="stat-label">Resolution Rate</p><p className="stat-value">{analytics.resolutionRate}%</p></div>
+      <div className="tab-content fade-in" key={tab}>
+        {/* OVERVIEW */}
+        {tab === 'overview' && analytics && (
+          <>
+            <div className="dash-stats">
+              <div className="stat-card"><p className="stat-label">Total Issues</p><p className="stat-value">{analytics.total}</p></div>
+              <div className="stat-card"><p className="stat-label">Open</p><p className="stat-value">{analytics.open}</p></div>
+              <div className="stat-card"><p className="stat-label">In Progress</p><p className="stat-value">{analytics.inProgress}</p></div>
+              <div className="stat-card"><p className="stat-label">Resolved</p><p className="stat-value">{analytics.resolved}</p></div>
+            </div>
+            <div className="dash-section" style={{ marginTop: 24 }}>
+              <div className="dash-section-header"><span className="dash-section-label">TOP CATEGORY</span></div>
+              <div className="admin-top-category">{analytics.topCategory}</div>
+            </div>
+          </>
+        )}
+
+        {/* ANALYTICS VISUALIZATION */}
+        {tab === 'analytics' && analytics && (
+          <div className="dash-section">
+            <div className="dash-section-header"><span className="dash-section-label">PERFORMANCE ANALYTICS</span></div>
+            
+            <div className="dash-stats">
+              <div className="stat-card">
+                <p className="stat-label">Resolution Rate</p>
+                <p className="stat-value">{analytics.resolutionRate}%</p>
+              </div>
+              <div className="stat-card">
+                <p className="stat-label">Total Users</p>
+                <p className="stat-value">{analytics.userCount}</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginTop: '24px' }}>
+              <div className="dash-empty" style={{ padding: '24px', textAlign: 'left' }}>
+                <p className="dash-section-label" style={{ marginBottom: '16px' }}>ISSUES BY CATEGORY</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {analytics.byCategory?.map(c => {
+                    const percent = Math.round((c.count / analytics.total) * 100);
+                    return (
+                      <div key={c._id} style={{ fontSize: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span>{c._id}</span>
+                          <span>{c.count}</span>
+                        </div>
+                        <div style={{ height: '6px', width: '100%', background: 'rgba(255,255,255,0.05)', borderRadius: '3px' }}>
+                          <div style={{ 
+                            height: '100%', 
+                            width: `${percent}%`, 
+                            background: 'var(--primary-color)', 
+                            borderRadius: '3px',
+                            transition: 'width 1s ease-out'
+                          }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="dash-empty" style={{ padding: '24px', textAlign: 'left' }}>
+                <p className="dash-section-label" style={{ marginBottom: '16px' }}>RESOLUTION PROGRESS</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '160px' }}>
+                  <div style={{ position: 'relative', width: '120px', height: '120px' }}>
+                      <svg viewBox="0 0 36 36" style={{ width: '100%', height: '100%' }}>
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="var(--primary-color)" strokeWidth="3"
+                          strokeDasharray={`${analytics.resolutionRate}, 100`} />
+                      </svg>
+                      <div style={{ 
+                        position: 'absolute', inset: 0, display: 'flex', 
+                        alignItems: 'center', justifyContent: 'center', 
+                        fontSize: '18px', fontWeight: '700' 
+                      }}>
+                        {analytics.resolutionRate}%
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="dash-section" style={{ marginTop: 24 }}>
-            <div className="dash-section-header"><span className="dash-section-label">TOP CATEGORY</span></div>
-            <div className="admin-top-category">{analytics.topCategory}</div>
-          </div>
-          {analytics.byCategory?.length > 0 && (
-            <div className="dash-section">
-              <div className="dash-section-header"><span className="dash-section-label">BY CATEGORY</span></div>
-              <div className="admin-cat-grid">
-                {analytics.byCategory.map((c) => (
-                  <div key={c._id} className="admin-cat-item">
-                    <span className="admin-cat-name">{c._id}</span>
-                    <span className="admin-cat-count">{c.count}</span>
+        )}
+
+        {/* COMPLAINTS */}
+        {tab === 'complaints' && (
+          <div className="dash-section">
+            <div className="dash-section-header"><span className="dash-section-label">ALL COMPLAINTS &mdash; {complaints.length}</span></div>
+            {complaints.length === 0 ? (
+              <div className="dash-empty">No complaints yet.</div>
+            ) : (
+              <div className="complaint-list">
+                {complaints.map((c) => (
+                  <div key={c._id} className="complaint-card"
+                    onClick={() => setSelected(selected?._id === c._id ? null : c)}>
+                    <div className="complaint-card-top">
+                      <span className="complaint-title">{c.title}</span>
+                      <Badge label={c.status} />
+                    </div>
+                    <div className="complaint-card-meta">
+                      <span className="meta-tag">{c.category}</span>
+                      <span>{c.createdBy?.username || 'Unknown'}</span>
+                      <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    {selected?._id === c._id && (
+                      <div className="complaint-detail fade-in">
+                        <p className="complaint-desc">{c.description}</p>
+                        <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+                          {['Open', 'In Progress', 'Resolved'].map((s) => (
+                            <Button key={s} size="sm" variant={c.status === s ? 'primary' : 'secondary'}
+                              onClick={(e) => { e.stopPropagation(); updateStatus(c._id, s); }}>{s}</Button>
+                          ))}
+                        </div>
+                        {c.remarks?.length > 0 && (
+                          <div className="remarks" style={{ marginTop: 14 }}>
+                            <p className="remarks-label">REMARKS</p>
+                            {c.remarks.map((r, i) => (
+                              <div key={i} className="remark-item">
+                                <span className="remark-author">{r.addedBy?.username || 'Staff'}</span>
+                                <span className="remark-text">{r.text}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+                          <input className="form-input" style={{ flex: 1 }} placeholder="Add a remark..."
+                            value={selected._id === c._id ? remarkText : ''}
+                            onChange={(e) => setRemarkText(e.target.value)}
+                            onClick={(e) => e.stopPropagation()} />
+                          <Button size="sm" variant="primary"
+                            onClick={(e) => { e.stopPropagation(); addRemark(c._id); }}>Add</Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </div>
+        )}
 
-      {/* COMPLAINTS */}
-      {tab === 'complaints' && (
-        <div className="dash-section">
-          <div className="dash-section-header"><span className="dash-section-label">ALL COMPLAINTS &mdash; {complaints.length}</span></div>
-          {complaints.length === 0 ? (
-            <div className="dash-empty">No complaints yet.</div>
-          ) : (
+        {/* USERS */}
+        {tab === 'users' && (
+          <div className="dash-section">
+            <div className="dash-section-header"><span className="dash-section-label">USERS &mdash; {users.length}</span></div>
             <div className="complaint-list">
-              {complaints.map((c) => (
-                <div key={c._id} className="complaint-card"
-                  onClick={() => setSelected(selected?._id === c._id ? null : c)}>
-                  <div className="complaint-card-top">
-                    <span className="complaint-title">{c.title}</span>
-                    <Badge label={c.status} />
-                  </div>
-                  <div className="complaint-card-meta">
-                    <span className="meta-tag">{c.category}</span>
-                    <span>{c.createdBy?.username || 'Unknown'}</span>
-                    <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  {selected?._id === c._id && (
-                    <div className="complaint-detail fade-in">
-                      <p className="complaint-desc">{c.description}</p>
-                      <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
-                        {['Open', 'In Progress', 'Resolved'].map((s) => (
-                          <Button key={s} size="sm" variant={c.status === s ? 'primary' : 'secondary'}
-                            onClick={(e) => { e.stopPropagation(); updateStatus(c._id, s); }}>{s}</Button>
-                        ))}
-                      </div>
-                      {c.remarks?.length > 0 && (
-                        <div className="remarks" style={{ marginTop: 14 }}>
-                          <p className="remarks-label">REMARKS</p>
-                          {c.remarks.map((r, i) => (
-                            <div key={i} className="remark-item">
-                              <span className="remark-author">{r.addedBy?.username || 'Staff'}</span>
-                              <span className="remark-text">{r.text}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-                        <input className="form-input" style={{ flex: 1 }} placeholder="Add a remark..."
-                          value={selected._id === c._id ? remarkText : ''}
-                          onChange={(e) => setRemarkText(e.target.value)}
-                          onClick={(e) => e.stopPropagation()} />
-                        <Button size="sm" variant="primary"
-                          onClick={(e) => { e.stopPropagation(); addRemark(c._id); }}>Add</Button>
-                      </div>
+              {users.map((u) => (
+                <div key={u._id} className="complaint-card" style={{ cursor: 'default' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <p className="complaint-title">{u.username}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>{u.email}</p>
                     </div>
-                  )}
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <select
+                        className="form-input"
+                        value={u.role}
+                        style={{ width: 'auto', padding: '4px 8px', fontSize: 11 }}
+                        onChange={(e) => updateRole(u._id, e.target.value)}
+                        disabled={u._id === user?._id}
+                      >
+                        <option value="student">student</option>
+                        <option value="staff">staff</option>
+                        <option value="admin">admin</option>
+                      </select>
+                      {u._id !== user?._id && (
+                        <button className="btn--danger" style={{ padding: '6px', borderRadius: '4px' }}
+                          onClick={() => deleteUserById(u._id)}>
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* USERS */}
-      {tab === 'users' && (
-        <div className="dash-section">
-          <div className="dash-section-header"><span className="dash-section-label">USERS &mdash; {users.length}</span></div>
-          <div className="admin-users-table">
-            <div className="admin-table-head admin-table-5col">
-              <span>NAME</span><span>EMAIL</span><span>ROLE</span><span>CHANGE ROLE</span><span>ACTION</span>
-            </div>
-            {users.map((u) => (
-              <div key={u._id} className="admin-table-row admin-table-5col">
-                <span>{u.username}</span>
-                <span className="truncate">{u.email}</span>
-                <span><Badge label={u.role} type="role" /></span>
-                <span>
-                  <select className="form-input" value={u.role} style={{ padding: '4px 8px', fontSize: 11 }}
-                    onChange={(e) => updateRole(u._id, e.target.value)}>
-                    <option value="student">student</option>
-                    <option value="staff">staff</option>
-                    <option value="admin">admin</option>
-                  </select>
-                </span>
-                <span>
-                  {u._id !== user?._id && (
-                    <button className="admin-delete-btn" onClick={() => deleteUserById(u._id)}
-                      title="Delete user"><Trash2 size={14} /></button>
-                  )}
-                </span>
+        {/* DOCUMENTS */}
+        {tab === 'documents' && (
+          <div className="dash-section">
+            <div className="dash-section-header">
+              <span className="dash-section-label">RAG DOCUMENTS &mdash; {documents.length}</span>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <label className="btn btn--primary btn--sm" style={{ cursor: 'pointer' }}>
+                  {uploading ? 'Uploading...' : 'Upload File'}
+                  <input type="file" accept=".txt,.pdf" onChange={handleFileUpload}
+                    style={{ display: 'none' }} disabled={uploading} />
+                </label>
+                <Button variant="danger" size="sm" onClick={resetRag}>Reset RAG</Button>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* DOCUMENTS */}
-      {tab === 'documents' && (
-        <div className="dash-section">
-          <div className="dash-section-header">
-            <span className="dash-section-label">RAG DOCUMENTS &mdash; {documents.length}</span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <label className="btn btn--primary btn--sm" style={{ cursor: 'pointer' }}>
-                {uploading ? 'Uploading...' : 'Upload File'}
-                <input type="file" accept=".txt,.pdf" onChange={handleFileUpload}
-                  style={{ display: 'none' }} disabled={uploading} />
-              </label>
-              <Button variant="danger" size="sm" onClick={resetRag}>Reset RAG</Button>
             </div>
+            {documents.length === 0 ? (
+              <div className="dash-empty">No documents ingested yet.</div>
+            ) : (
+              <div className="complaint-list">
+                {documents.map((d) => (
+                  <div key={d._id} className="complaint-card" style={{ cursor: 'default' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <p className="complaint-title">{d.originalName}</p>
+                        <div className="complaint-card-meta" style={{ marginTop: '4px' }}>
+                          <span className="meta-tag">{d.type}</span>
+                          <span>{d.chunkCount} chunks</span>
+                        </div>
+                      </div>
+                      <Badge label={d.status === 'ingested' ? 'Resolved' : 'Open'} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          {documents.length === 0 ? (
-            <div className="dash-empty">No documents ingested yet. Upload ASTU policy docs to power the AI assistant.</div>
-          ) : (
-            <div className="admin-users-table">
-              <div className="admin-table-head admin-table-doc"><span>NAME</span><span>TYPE</span><span>STATUS</span><span>CHUNKS</span><span>DATE</span></div>
-              {documents.map((d) => (
-                <div key={d._id} className="admin-table-row admin-table-doc">
-                  <span className="truncate">{d.originalName}</span>
-                  <span>{d.type}</span>
-                  <span><Badge label={d.status === 'ingested' ? 'Resolved' : d.status === 'pending' ? 'Open' : 'In Progress'} /></span>
-                  <span>{d.chunkCount}</span>
-                  <span className="meta-date">{new Date(d.createdAt).toLocaleDateString()}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

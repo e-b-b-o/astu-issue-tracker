@@ -8,13 +8,34 @@
   min-height: 100vh;
   padding: 24px;
   gap: 16px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+/* Subtle dark overlay for readability */
+.auth-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.auth-back-link,
+.auth-card {
+  position: relative;
+  z-index: 2;
 }
 
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
+  background: rgba(10, 10, 10, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 40px 36px;
   box-shadow: var(--shadow-md);

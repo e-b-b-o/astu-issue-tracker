@@ -1,20 +1,27 @@
 /* Admin-specific styles */
 .admin-cat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  background: transparent;
+  border: none;
+  overflow: visible;
 }
 
 .admin-cat-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
+  padding: 16px 20px;
   background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all var(--transition-fast);
+}
+
+.admin-cat-item:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.01);
 }
 
 .admin-cat-name {
@@ -31,6 +38,12 @@
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
 }
+
+/* Transitions for analytics bars */
+.dash-empty div[style*="transition"] {
+  transition: width 1s ease-out;
+}
+
 
 .admin-top-category {
   font-size: 16px;

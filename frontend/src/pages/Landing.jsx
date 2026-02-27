@@ -4,6 +4,7 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import Button from '../components/ui/Button';
 import { ShieldCheck, Clock, BarChart2, MessageSquare, ArrowRight } from 'lucide-react';
+import heroBg from '../assets/images/vitaly-gariev-K_MSe-zglGI-unsplash.jpg';
 import './Landing.css';
 
 const FEATURES = [
@@ -52,7 +53,7 @@ const Landing = () => (
       <section className="landing-section" id="features">
         <div className="landing-section-header">
           <div className="landing-eyebrow">CAPABILITIES</div>
-          <h2>Why ASTU Tracker?</h2>
+          <h2>Why ASTU Issue Tracker?</h2>
           <p>Designed to provide a seamless experience for students and staff alike.</p>
         </div>
         <div className="landing-grid">
@@ -69,27 +70,29 @@ const Landing = () => (
       </section>
 
       {/* How It Works — Steps as Cards */}
-      <section className="landing-section">
-        <div className="landing-section-header">
-          <div className="landing-eyebrow">PROCESS</div>
-          <h2>How It Works</h2>
-          <p>Three simple steps to resolve your issues.</p>
-        </div>
-        <div className="landing-steps-grid">
-          {STEPS.map(({ n, title, desc }) => (
-            <div className="landing-step-card" key={n}>
-              <div className="landing-step-num">{n}</div>
-              <h3 className="landing-step-title">{title}</h3>
-              <p className="landing-step-desc">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <div className="landing-steps-wrapper">
+        <section className="landing-section">
+          <div className="landing-section-header">
+            <div className="landing-eyebrow">PROCESS</div>
+            <h2>How It Works</h2>
+            <p>Three simple steps to resolve your issues.</p>
+          </div>
+          <div className="landing-steps-grid">
+            {STEPS.map(({ n, title, desc }) => (
+              <div className="landing-step-card" key={n}>
+                <div className="landing-step-num">{n}</div>
+                <h3 className="landing-step-title">{title}</h3>
+                <p className="landing-step-desc">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* CTA */}
       <section className="landing-cta-section">
         <div className="landing-cta-card">
-          <h2>Ready to make a difference?</h2>
+          <h2>Ready to Make Your Request?</h2>
           <p>Join the platform and help us improve our campus environment.</p>
           <Link to="/register">
             <Button variant="primary" size="lg">Create Account</Button>

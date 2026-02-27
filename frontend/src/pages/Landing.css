@@ -20,6 +20,12 @@
   justify-content: center;
   padding: 80px 24px;
   text-align: center;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                    url('../assets/images/vitaly-gariev-K_MSe-zglGI-unsplash.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
 }
 
 .landing-hero-content { max-width: 640px; }
@@ -74,6 +80,21 @@
 .landing-section-header p {
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+/* Background for How It Works section — Full Width */
+.landing-steps-wrapper {
+  width: 100%;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                    url('../assets/images/Steps.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-top: 1px solid var(--border);
+}
+
+.landing-steps-wrapper .landing-section {
+  border-top: none;
 }
 
 /* ===== Feature Cards ===== */
@@ -134,8 +155,10 @@
 }
 
 .landing-step-card {
-  background: var(--card-bg);
-  border: 1px solid rgba(39, 39, 42, 0.6);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   padding: 32px 28px;
   transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1),

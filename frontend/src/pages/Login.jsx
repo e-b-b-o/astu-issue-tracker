@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import Button from '../components/ui/Button';
+import loginBg from '../assets/images/vitaly-gariev-K_MSe-zglGI-unsplash.jpg';
 import './Auth.css';
 
 const Login = () => {
@@ -26,11 +27,11 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-page fade-in">
+    <div className="auth-page fade-in" style={{ backgroundImage: `url(${loginBg})` }}>
       <Link to="/" className="auth-back-link"><ArrowLeft size={14} /> Back to Home</Link>
       <div className="auth-card fade-in-up">
         <div className="auth-header">
-          <div className="auth-logo">■ ASTU TRACKER</div>
+          <div className="auth-logo">■ ASTU ISSUE TRACKER</div>
           <h1 className="auth-title">Sign In</h1>
           <p className="auth-subtitle">Enter your credentials to access the system.</p>
         </div>

@@ -30,7 +30,7 @@ const ForgotPassword = () => {
       <Link to="/login" className="auth-back-link"><ArrowLeft size={14} /> Back to Login</Link>
       <div className="auth-card fade-in-up">
         <div className="auth-header">
-          <div className="auth-logo">■ ASTU TRACKER</div>
+          <div className="auth-logo">■ ASTU ISSUE TRACKER</div>
           <h1 className="auth-title">Forgot Password</h1>
           <p className="auth-subtitle">Enter your email and we'll send you your password.</p>
         </div>
