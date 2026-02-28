@@ -1,6 +1,8 @@
 import Chat from '../models/Chat.js';
 
-
+// Track last successful RAG response time globally (in-memory)
+let lastRAGSuccessfulResponse = null;
+const WAKE_UP_THRESHOLD_MS = 15 * 60 * 1000; // 15 minutes
 
 // @route   POST /api/chat/ask
 // @access  Private
@@ -35,16 +37,30 @@ export const askQuestion = async (req, res) => {
 
     // 5. Proxy to Flask RAG service
     const rawUrl = process.env.RAG_SERVICE_URL || 'http://localhost:5001';
-    // Remove trailing slashes to prevent //query issues
     const RAG_BASE = rawUrl.replace(/\/+$/, "");
     const targetUrl = `${RAG_BASE}/query`;
     const healthUrl = `${RAG_BASE}/health`;
 
-    // —— WAKE-UP LOGIC (Render Free Tier Support) ——
+    // —— AUTOMATED WAKE-UP LOGIC (15-Minute Threshold) ——
+    const now = Date.now();
+    const timeSinceLastSuccess = lastRAGSuccessfulResponse ? now - lastRAGSuccessfulResponse : Infinity;
+    
+    // If it's been > 15 mins (or first time), trigger the "waking up" message
+    if (timeSinceLastSuccess >= WAKE_UP_THRESHOLD_MS) {
+      console.log(`[Chat] RAG inactive for ${Math.round(timeSinceLastSuccess/60000)} mins. Triggering wake-up...`);
+      fetch(healthUrl).catch(() => {}); // Trigger background wake-up
+      
+      res.write(`data: I’m waking up, please try again after 60 seconds.\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return;
+    }
+
+    // Secondary Pre-flight safety check (fast 2s timeout)
     let isAwake = false;
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s pre-flight check
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
       const ping = await fetch(healthUrl, { signal: controller.signal });
       clearTimeout(timeoutId);
       isAwake = ping.ok;
@@ -53,10 +69,8 @@ export const askQuestion = async (req, res) => {
     }
 
     if (!isAwake) {
-      console.log(`[Chat] RAG service appears to be asleep at ${RAG_BASE}. Triggering wake-up...`);
-      // Start a "real" wake-up request in the background (no await)
+      console.log(`[Chat] RAG pre-flight failed (ping timeout). Triggering wake-up...`);
       fetch(healthUrl).catch(() => {}); 
-      
       res.write(`data: I’m waking up, please try again after 60 seconds.\n\n`);
       res.write('data: [DONE]\n\n');
       res.end();
@@ -72,6 +86,7 @@ export const askQuestion = async (req, res) => {
         body: JSON.stringify({ query: message, history }),
       });
       if (ragResponse.ok) {
+        lastRAGSuccessfulResponse = Date.now(); // Update success timestamp
         console.log(`[Chat] RAG service is awake and responding.`);
       }
     } catch (fetchError) {
