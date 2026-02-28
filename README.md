@@ -40,9 +40,9 @@ Whether deployed to the cloud or running locally for development, this architect
 
 *Note: Screenshots will be added here. To add your own, place the images inside the `images/` directory.*
 
-| Dashboard View | Admin Panel | AI Chat Interface |
+|Large Screens | Smaller screens | DashBoard |
 |:---:|:---:|:---:|
-| ![Dashboard](images/dashboard.png) | ![Admin Panel](images/admin.png) | ![AI Chat](images/chat.png) |
+| ![Large screens](showcase/ait_pc.png) | ![smaller screens](showcase/ait.png) | ![dashboard with ai rag](showcase/ait_dash.png) |
 
 ---
 
