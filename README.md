@@ -44,7 +44,7 @@ Whether deployed to the cloud or running locally for development, this architect
 ![Landing Page - Desktop](showcase/ait_pc.png)
 
 **Dashboard with AI RAG Assistant (Desktop View)**  
-![Dashboard with AI - Desktop](showcase/iait_dash.png)
+![Dashboard with AI - Desktop](showcase/ait_dash.png)
 
 ---
 
@@ -54,7 +54,7 @@ Whether deployed to the cloud or running locally for development, this architect
 ![Landing Page - Mobile](showcase/ait_phone_landing.png)
 
 **Responsive Dashboard (Mobile View)**  
-![Dashboard - Mobile](showcase/ait_phone.png)
+![Dashboard - Mobile](showcase/iait_phone.png)
 
 ---
 
