@@ -14,11 +14,7 @@ const chunkText = (text, size = 1000) => {
   return chunks;
 };
 
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const pdfModule = require('pdf-parse');
-// Handle both direct and .default exports for maximum CJS/ESM compatibility
-const pdf = typeof pdfModule === 'function' ? pdfModule : pdfModule.default;
+import { PDFParse } from 'pdf-parse';
 
 // @route   POST /api/admin/ingest
 // @access  Private (Admin)
@@ -32,20 +28,20 @@ export const ingestDocument = async (req, res) => {
 
   try {
     if (isPdf) {
-      if (typeof pdf !== 'function') {
-        console.error('[Admin] PDF library error: pdf is not a function', {
-          type: typeof pdf,
-          hasDefault: !!pdfModule.default
-        });
-        return res.status(500).json({ message: 'PDF processing library is not properly initialized' });
-      }
-
       try {
-        const data = await pdf(req.file.buffer);
+        // pdf-parse v2.4.5 uses a class-based API
+        const pdfParser = new PDFParse({ data: req.file.buffer });
+        const data = await pdfParser.getText();
         textToIngest = data.text;
+        
+        // Cleanup resources
+        await pdfParser.destroy();
       } catch (pdfError) {
         console.error('[Admin] PDF Parse failure:', pdfError.message);
-        return res.status(400).json({ message: 'Failed to parse PDF content: ' + pdfError.message });
+        return res.status(400).json({ 
+          message: 'Failed to parse PDF content. The file might be corrupted or in an unsupported format.',
+          error: pdfError.message 
+        });
       }
     } else {
       textToIngest = req.file.buffer.toString('utf-8');
