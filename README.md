@@ -38,11 +38,9 @@ Whether deployed to the cloud or running locally for development, this architect
 
 ## 📸 Project Showcase
 
-*Note: Screenshots will be added here. To add your own, place the images inside the `images/` directory.*
-
-|Large Screens | Smaller screens | DashBoard |
-|:---:|:---:|:---:|
-| ![Large screens](showcase/ait_pc.png) | ![smaller screens](showcase/ait.png) | ![dashboard with ai rag](showcase/ait_dash.png) |
+|Large Screens | Smaller screens | DashBoard | Small Dashboard |
+|:---:|:---:|:---:| : --- : |
+| ![Large screens](showcase/ait_pc.png) | ![smaller screens](showcase/ait_phone_landing.png) | ![dashboard with ai rag](showcase/ait_dash.png) | ![dashboard with ai rag](showcase/ait_phone.png) |
 
 ---
 
