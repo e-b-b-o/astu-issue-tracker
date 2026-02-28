@@ -83,9 +83,14 @@ app.use(globalLimiter);
 // —— Static uploads ——
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// —— Health check ——
+// —— Health checks ——
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', service: 'ASTU Backend', timestamp: new Date().toISOString() });
+});
+
+// Root route for platform health probes (Render)
+app.get('/', (_req, res) => {
+  res.status(200).send('ASTU Issue Tracker API is live.');
 });
 
 // —— Routes ——
@@ -96,18 +101,33 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 
+// —— Global error handler ——
+app.use((err, _req, res, _next) => {
+  console.error('[Server Error]', err);
+  res.status(err.status || 500).json({ 
+    error: err.message || 'Internal server error',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // —— 404 Handler ——
 app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// —— Global error handler ——
-app.use((err, _req, res, _next) => {
-  console.error('[Server Error]', err);
-  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+// —— Global Process Handlers (Critical for Production Stability) ——
+process.on('uncaughtException', (err) => {
+  console.error('🔥 UNCAUGHT EXCEPTION:', err.message);
+  console.error(err.stack);
+  // Give the server a small window to log before exiting
+  setTimeout(() => process.exit(1), 1000);
 });
 
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ UNHANDLED REJECTION at:', promise, 'reason:', reason);
+});
+
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ ASTU Backend running on port ${PORT}`);
 });
