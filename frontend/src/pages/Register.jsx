@@ -59,15 +59,6 @@ const Register = () => {
               placeholder="Min. 6 characters" value={form.password} onChange={handleChange} required />
           </div>
 
-          <div className="auth-field">
-            <label className="auth-label" htmlFor="role">ROLE</label>
-            <select id="role" name="role" className="auth-input auth-select"
-              value={form.role} onChange={handleChange}>
-              <option value="student">Student</option>
-              <option value="staff">Staff</option>
-            </select>
-          </div>
-
           <Button type="submit" variant="primary" size="lg" fullWidth loading={loading}>
             Create Account
           </Button>

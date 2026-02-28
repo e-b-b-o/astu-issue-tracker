@@ -102,6 +102,19 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDeleteComplaint = async (e, id) => {
+    e.stopPropagation();
+    if (!confirm('Are you sure you want to delete this issue?')) return;
+    try {
+      await api.delete(`/complaints/${id}`);
+      addToast('Issue deleted', 'success');
+      fetchAll();
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Delete failed', 'error');
+    }
+  };
+
+
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -280,9 +293,19 @@ const AdminDashboard = () => {
                       <Badge label={c.status} />
                     </div>
                     <div className="complaint-card-meta">
-                      <span className="meta-tag">{c.category}</span>
-                      <span>{c.createdBy?.username || 'Unknown'}</span>
-                      <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                        <span className="meta-tag">{c.category}</span>
+                        <span>{c.createdBy?.username || 'Unknown'}</span>
+                        <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <button 
+                        className="delete-btn" 
+                        onClick={(e) => handleDeleteComplaint(e, c._id)}
+                        style={{ background: 'none', border: 'none', color: '#ff4d4f', cursor: 'pointer', padding: '4px', borderRadius: '4px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        title="Delete Issue"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                     {selected?._id === c._id && (
                       <div className="complaint-detail fade-in">

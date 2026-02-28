@@ -4,6 +4,7 @@ import { useNotification } from '../../context/NotificationContext';
 import api from '../../services/api';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
+import { Trash2 } from 'lucide-react';
 
 import './StudentDashboard.css';
 
@@ -61,6 +62,19 @@ const StudentDashboard = () => {
     }
   };
 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this issue?')) return;
+    try {
+      await api.delete(`/complaints/${id}`);
+      addToast('Issue deleted successfully', 'success');
+      setComplaints(complaints.filter(c => c._id !== id));
+      if (selected?._id === id) setSelected(null);
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Delete failed', 'error');
+    }
+  };
+
   return (
     <div className="student-dash fade-in-up">
       <div className="dash-topbar">
@@ -98,8 +112,18 @@ const StudentDashboard = () => {
                       <Badge label={c.status} />
                     </div>
                     <div className="complaint-card-meta">
-                      <span className="meta-tag">{c.category}</span>
-                      <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                        <span className="meta-tag">{c.category}</span>
+                        <span className="meta-date">{new Date(c.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <button 
+                        className="delete-btn" 
+                        onClick={(e) => handleDelete(e, c._id)}
+                        style={{ background: 'none', border: 'none', color: '#ff4d4f', cursor: 'pointer', padding: '4px', borderRadius: '4px', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        title="Delete Issue"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                     {selected?._id === c._id && (
                       <div className="complaint-detail fade-in">
