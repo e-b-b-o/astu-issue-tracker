@@ -38,9 +38,23 @@ Whether deployed to the cloud or running locally for development, this architect
 
 ## 📸 Project Showcase
 
-|Large Screens | Smaller screens | DashBoard | Small Dashboard |
-|:---:|:---:|:---:| : --- : |
-| ![Large screens](showcase/ait_pc.png) | ![smaller screens](showcase/ait_phone_landing.png) | ![dashboard with ai rag](showcase/ait_dash.png) | ![dashboard with ai rag](showcase/ait_phone.png) |
+### 🖥️ Desktop Experience
+
+**Landing Page (Desktop View)**  
+![Landing Page - Desktop](showcase/ait_pc.png)
+
+**Dashboard with AI RAG Assistant (Desktop View)**  
+![Dashboard with AI - Desktop](showcase/iait_dash.png)
+
+---
+
+### 📱 Mobile Experience
+
+**Landing Page (Mobile View)**  
+![Landing Page - Mobile](showcase/ait_phone_landing.png)
+
+**Responsive Dashboard (Mobile View)**  
+![Dashboard - Mobile](showcase/ait_phone.png)
 
 ---
 
@@ -130,7 +144,6 @@ VITE_API_BASE_URL=http://localhost:10000/api
 
 ### RAG Service (`rag_service/.env`)
 ```env
-# Add required LLM API keys or embedding configurations here
 OPENAI_API_KEY=your_openai_api_key_if_applicable
 PORT=5001
 ```
@@ -161,5 +174,5 @@ The Retrieval-Augmented Generation (RAG) feature provides users with an intellig
 
 ---
 <div align="center">
-  <p>Built with ❤️ by the ASTU STEM Development Team Candidates.</p>
+  <p>Built with ❤️ by the ASTU STEM Development Team Candidate.</p>
 </div>
