@@ -183,3 +183,36 @@ export const addRemark = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @route   DELETE /api/complaints/:id
+// @access  Private
+export const deleteComplaint = async (req, res) => {
+  try {
+    const complaint = await Complaint.findById(req.params.id);
+
+    if (!complaint) {
+      return res.status(404).json({ message: 'Complaint not found' });
+    }
+
+    // Role-based authorization
+    // Admins can delete anything
+    // Students can only delete their own
+    // Staff? The requirement says: "Staff and Admin can still manage issues normally." 
+    // Usually, manage includes delete. I'll allow Staff and Admin.
+    
+    const isOwner = complaint.createdBy.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+    const isStaff = req.user.role === 'staff';
+
+    if (!isOwner && !isAdmin && !isStaff) {
+      return res.status(403).json({ message: 'Not authorized to delete this complaint' });
+    }
+
+    await complaint.deleteOne();
+    res.json({ message: 'Complaint removed' });
+  } catch (error) {
+    console.error('[Complaint] Delete error:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+

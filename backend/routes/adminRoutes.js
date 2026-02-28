@@ -21,6 +21,7 @@ router.get('/documents', getDocuments);
 router.post('/reset-rag', resetRag);
 router.get('/users', getUsers);
 router.put('/users/:id/role', updateUserRole);
+router.patch('/update-role/:userId', updateUserRole);
 router.delete('/users/:id', deleteUser);
 router.get('/analytics', getAnalytics);
 

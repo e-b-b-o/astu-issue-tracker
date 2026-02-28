@@ -2,15 +2,15 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 
-// Generate 30-day JWT
-const generateToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+// Generate 30-day JWT with role
+const generateToken = (id, role) =>
+  jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
 // @route   POST /api/auth/register
 // @access  Public
 export const registerUser = async (req, res) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({ message: 'Please provide username, email, and password' });
@@ -21,18 +21,15 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'User already exists with that email' });
     }
 
-    // Only allow 'student' or 'staff' via self-registration; admin via seeding
-    const allowedRoles = ['student', 'staff'];
-    const assignedRole = allowedRoles.includes(role) ? role : 'student';
-
-    const user = await User.create({ username, email, password, role: assignedRole });
+    // Force 'student' role for new registrations
+    const user = await User.create({ username, email, password, role: 'student' });
 
     res.status(201).json({
       _id: user._id,
       username: user.username,
       email: user.email,
       role: user.role,
-      token: generateToken(user._id),
+      token: generateToken(user._id, user.role),
     });
   } catch (error) {
     console.error('[Auth] Register error:', error.message);
@@ -58,7 +55,7 @@ export const loginUser = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        token: generateToken(user._id),
+        token: generateToken(user._id, user.role),
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
