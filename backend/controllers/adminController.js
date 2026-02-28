@@ -16,7 +16,9 @@ const chunkText = (text, size = 1000) => {
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
-const pdf = require('pdf-parse');
+const pdfModule = require('pdf-parse');
+// Handle both direct and .default exports for maximum CJS/ESM compatibility
+const pdf = typeof pdfModule === 'function' ? pdfModule : pdfModule.default;
 
 // @route   POST /api/admin/ingest
 // @access  Private (Admin)
@@ -30,8 +32,21 @@ export const ingestDocument = async (req, res) => {
 
   try {
     if (isPdf) {
-      const data = await pdf(req.file.buffer);
-      textToIngest = data.text;
+      if (typeof pdf !== 'function') {
+        console.error('[Admin] PDF library error: pdf is not a function', {
+          type: typeof pdf,
+          hasDefault: !!pdfModule.default
+        });
+        return res.status(500).json({ message: 'PDF processing library is not properly initialized' });
+      }
+
+      try {
+        const data = await pdf(req.file.buffer);
+        textToIngest = data.text;
+      } catch (pdfError) {
+        console.error('[Admin] PDF Parse failure:', pdfError.message);
+        return res.status(400).json({ message: 'Failed to parse PDF content: ' + pdfError.message });
+      }
     } else {
       textToIngest = req.file.buffer.toString('utf-8');
     }
@@ -77,9 +92,13 @@ export const ingestDocument = async (req, res) => {
     });
   } catch (error) {
     console.error('[Admin] Ingest error:', error.message);
-    res.status(500).json({ message: error.message });
+    // Ensure we don't crash and return a clean response
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Internal server error during ingestion: ' + error.message });
+    }
   }
 };
+
 
 
 // @route   GET /api/admin/documents
