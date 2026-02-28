@@ -1,7 +1,8 @@
 import Chat from '../models/Chat.js';
 
 // Track last successful RAG response time globally (in-memory)
-let lastRAGSuccessfulResponse = null;
+// Initialized to current time to prevent "Infinity" on first boot
+let lastRAGSuccessfulResponse = Date.now();
 const WAKE_UP_THRESHOLD_MS = 15 * 60 * 1000; // 15 minutes
 
 // @route   POST /api/chat/ask
@@ -43,7 +44,9 @@ export const askQuestion = async (req, res) => {
 
     // —— AUTOMATED WAKE-UP LOGIC (15-Minute Threshold) ——
     const now = Date.now();
-    const timeSinceLastSuccess = lastRAGSuccessfulResponse ? now - lastRAGSuccessfulResponse : Infinity;
+    // Use current time as fallback if for some reason it's null, preventing Infinity
+    const lastSuccess = lastRAGSuccessfulResponse || now;
+    const timeSinceLastSuccess = now - lastSuccess;
     
     // If it's been > 15 mins (or first time), trigger the "waking up" message
     if (timeSinceLastSuccess >= WAKE_UP_THRESHOLD_MS) {
