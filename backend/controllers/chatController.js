@@ -1,6 +1,6 @@
 import Chat from '../models/Chat.js';
 
-const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL || 'http://localhost:5001';
+
 
 // @route   POST /api/chat/ask
 // @access  Private
@@ -34,16 +34,22 @@ export const askQuestion = async (req, res) => {
     res.flushHeaders();
 
     // 5. Proxy to Flask RAG service
+    const rawUrl = process.env.RAG_SERVICE_URL || 'http://localhost:5001';
+    // Remove trailing slashes to prevent //query issues
+    const RAG_BASE = rawUrl.replace(/\/+$/, "");
+    const targetUrl = `${RAG_BASE}/query`;
+
     let ragResponse;
     try {
-      ragResponse = await fetch(`${RAG_SERVICE_URL}/query`, {
+      console.log(`[Chat] Proxying request to RAG: ${targetUrl}`);
+      ragResponse = await fetch(targetUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: message, history }),
       });
     } catch (fetchError) {
       console.error('[Chat] RAG service unreachable:', fetchError.message);
-      res.write(`data: [ERROR] RAG service is unavailable. Please try again later.\n\n`);
+      res.write(`data: [ERROR] AI service is currently unavailable or unreachable (${fetchError.message}).\n\n`);
       res.write('data: [DONE]\n\n');
       res.end();
       return;
