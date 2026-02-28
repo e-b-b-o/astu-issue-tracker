@@ -15,6 +15,8 @@ const documentSchema = new mongoose.Schema(
       default: 'pending',
     },
     chunkCount: { type: Number, default: 0 },
+    fileData: { type: String }, // Store Base64 data
+    fileSize: { type: Number },
   },
   { timestamps: true }
 );

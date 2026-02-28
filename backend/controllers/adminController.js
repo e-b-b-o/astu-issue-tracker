@@ -14,6 +14,8 @@ const chunkText = (text, size = 1000) => {
   return chunks;
 };
 
+import pdf from 'pdf-parse';
+
 // @route   POST /api/admin/ingest
 // @access  Private (Admin)
 export const ingestDocument = async (req, res) => {
@@ -21,16 +23,31 @@ export const ingestDocument = async (req, res) => {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  const docRecord = await Document.create({
-    originalName: req.file.originalname,
-    type: 'file',
-    uploadedBy: req.user._id,
-    status: 'pending',
-  });
+  let textToIngest = '';
+  const isPdf = req.file.mimetype === 'application/pdf';
 
   try {
-    const rawText = fs.readFileSync(req.file.path, 'utf-8');
-    const chunks = chunkText(rawText, 1000);
+    if (isPdf) {
+      const data = await pdf(req.file.buffer);
+      textToIngest = data.text;
+    } else {
+      textToIngest = req.file.buffer.toString('utf-8');
+    }
+
+    if (!textToIngest || textToIngest.trim().length === 0) {
+      return res.status(400).json({ message: 'No readable text found in document' });
+    }
+
+    const docRecord = await Document.create({
+      originalName: req.file.originalname,
+      type: 'file',
+      uploadedBy: req.user._id,
+      status: 'pending',
+      fileData: req.file.buffer.toString('base64'),
+      fileSize: req.file.size,
+    });
+
+    const chunks = chunkText(textToIngest, 1000);
 
     // Send each chunk to Flask /ingest
     const ingestPromises = chunks.map((chunk, idx) =>
@@ -52,20 +69,16 @@ export const ingestDocument = async (req, res) => {
     docRecord.status = failed === 0 ? 'ingested' : 'failed';
     await docRecord.save();
 
-    // Clean up uploaded temp file
-    fs.unlinkSync(req.file.path);
-
     res.json({
       message: `Ingested ${docRecord.chunkCount} of ${chunks.length} chunks`,
       document: docRecord,
     });
   } catch (error) {
     console.error('[Admin] Ingest error:', error.message);
-    docRecord.status = 'failed';
-    await docRecord.save();
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // @route   GET /api/admin/documents
 // @access  Private (Admin)

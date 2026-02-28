@@ -10,13 +10,21 @@ import {
 } from '../controllers/adminController.js';
 import { protect, admin } from '../middlewares/authMiddleware.js';
 import upload from '../middlewares/uploadMiddleware.js';
+import uploadPDF from '../middlewares/pdfUploadMiddleware.js';
 
 const router = express.Router();
 
 // All admin routes require protect + admin
 router.use(protect, admin);
 
-router.post('/ingest', upload.single('document'), ingestDocument);
+router.post('/ingest', (req, res, next) => {
+  uploadPDF.single('document')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    next();
+  });
+}, ingestDocument);
 router.get('/documents', getDocuments);
 router.post('/reset-rag', resetRag);
 router.get('/users', getUsers);
