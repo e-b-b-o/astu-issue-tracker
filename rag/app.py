@@ -16,6 +16,7 @@ print(f"[RAG] Allowed Origins: {allowed_origins}")
 CORS(app, origins=allowed_origins)
 
 
+@app.route("/", methods=["GET"])
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok", "service": "ASTU RAG Service", **rag_engine.status()})
@@ -68,6 +69,7 @@ def reset():
 
 
 if __name__ == "__main__":
+    # Render provides PORT, default to 5001 for local dev
     port = int(os.environ.get("PORT", 5001))
-    print(f"🚀 ASTU RAG Service starting on port {port}")
+    print(f"🚀 ASTU RAG Service starting on port {port} (0.0.0.0)")
     app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
