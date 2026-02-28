@@ -14,7 +14,9 @@ const chunkText = (text, size = 1000) => {
   return chunks;
 };
 
-import pdf from 'pdf-parse';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pdf = require('pdf-parse');
 
 // @route   POST /api/admin/ingest
 // @access  Private (Admin)
