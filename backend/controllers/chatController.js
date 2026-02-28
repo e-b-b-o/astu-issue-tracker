@@ -38,6 +38,30 @@ export const askQuestion = async (req, res) => {
     // Remove trailing slashes to prevent //query issues
     const RAG_BASE = rawUrl.replace(/\/+$/, "");
     const targetUrl = `${RAG_BASE}/query`;
+    const healthUrl = `${RAG_BASE}/health`;
+
+    // —— WAKE-UP LOGIC (Render Free Tier Support) ——
+    let isAwake = false;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s pre-flight check
+      const ping = await fetch(healthUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      isAwake = ping.ok;
+    } catch (e) {
+      isAwake = false;
+    }
+
+    if (!isAwake) {
+      console.log(`[Chat] RAG service appears to be asleep at ${RAG_BASE}. Triggering wake-up...`);
+      // Start a "real" wake-up request in the background (no await)
+      fetch(healthUrl).catch(() => {}); 
+      
+      res.write(`data: I’m waking up, please try again after 60 seconds.\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return;
+    }
 
     let ragResponse;
     try {
@@ -47,6 +71,9 @@ export const askQuestion = async (req, res) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: message, history }),
       });
+      if (ragResponse.ok) {
+        console.log(`[Chat] RAG service is awake and responding.`);
+      }
     } catch (fetchError) {
       console.error('[Chat] RAG service unreachable:', fetchError.message);
       res.write(`data: [ERROR] AI service is currently unavailable or unreachable (${fetchError.message}).\n\n`);
